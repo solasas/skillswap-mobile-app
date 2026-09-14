@@ -27,10 +27,28 @@ complementary users, request a swap, schedule sessions, rate each other).
 The API spec handed to this client didn't document the exact JSON shape of
 `GET /matches` / `/matches/mutual` / `/matches/{userId}`. `MatchResult`
 (`lib/models/match_result.dart`) parses defensively, trying several likely
-field-name variants (`user`/`matchedUser`, `theyTeach`/`canTeachYou`/etc.) and
-degrading to empty lists rather than throwing. If the real backend uses
-different keys, adjust the `_firstOf` lookups there — nothing else in the app
-depends on the raw JSON.
+field-name variants and degrading to empty lists rather than throwing.
+
+Confirmed against a running backend instance, the actual keys are:
+
+```json
+{
+  "user": { "id": 6, "name": "...", "email": "...", "bio": null, "city": null,
+            "averageRating": null, "totalRatings": null },
+  "theyCanTeachMe": [ { "id": 24, "name": "...", "category": "...", "description": null } ],
+  "iCanTeachThem":  [ { "id": 25, "name": "...", "category": "...", "description": null } ],
+  "isMutual": true
+}
+```
+
+`theyCanTeachMe` and `iCanTeachThem` are tried first in `MatchResult.fromJson`,
+with the earlier guessed variants (`skillsTheyCanTeachYou`, `theyTeach`,
+`canTeachYou`, etc.) kept as fallbacks in case the backend shape changes
+again. If parsing ever silently degrades to empty lists (e.g. dropdowns on
+the send-request screen showing "No listed skills to choose from" for a
+match that clearly has overlapping skills), re-check this shape against the
+live backend and update the `_firstOf` key lists in `match_result.dart`
+rather than guessing further.
 
 Similarly `RatingSummary.fromJson` (`lib/models/rating.dart`) tries a few
 common key names (`averageRating`/`averageStars`/`average`, etc.) for

@@ -1,12 +1,13 @@
 import 'skill.dart';
 import 'user.dart';
 
-/// The exact JSON shape of `/matches` responses isn't specified in the API
+/// The exact JSON shape of `/matches` responses wasn't specified in the API
 /// docs handed to the client, so this parses defensively: it tries several
 /// plausible field-name variants for the matched user and the overlapping
-/// skill lists, and falls back to empty/false rather than throwing. If the
-/// real backend response uses different keys, adjust the `_firstOf` lookups
-/// below — the rest of the app only depends on this class's fields.
+/// skill lists, and falls back to empty/false rather than throwing. The
+/// real backend uses `theyCanTeachMe` / `iCanTeachThem` (confirmed against
+/// a running instance); those are tried first, with the other guesses kept
+/// as fallbacks in case of future backend changes.
 class MatchResult {
   final User user;
   final List<Skill> skillsTheyCanTeachYou;
@@ -23,6 +24,7 @@ class MatchResult {
   factory MatchResult.fromJson(Map<String, dynamic> json) {
     final userJson = _firstOf(json, ['user', 'matchedUser', 'matchUser']);
     final teachJson = _firstOf(json, [
+      'theyCanTeachMe',
       'skillsTheyCanTeachYou',
       'theyTeach',
       'canTeachYou',
@@ -30,6 +32,7 @@ class MatchResult {
       'offeredSkills',
     ]);
     final learnJson = _firstOf(json, [
+      'iCanTeachThem',
       'skillsYouCanTeachThem',
       'theyWantToLearn',
       'canLearnFromYou',
