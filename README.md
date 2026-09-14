@@ -1,18 +1,59 @@
-# skillswap
+# SkillSwap (Flutter frontend)
 
-A new Flutter project.
+Flutter client for the SkillSwap Spring Boot backend — a community
+skill-exchange app (list skills you teach/want to learn, match with
+complementary users, request a swap, schedule sessions, rate each other).
 
-## Getting Started
+## Architecture
 
-This project is a starting point for a Flutter application.
+- **Networking**: `dio`, with an interceptor (`lib/core/network/dio_client.dart`)
+  that attaches the JWT to every request and forces logout on a 401.
+- **State management**: Riverpod (`flutter_riverpod`). Repositories are plain
+  Dio wrappers (`lib/repositories`); screens read `FutureProvider`s
+  (`lib/providers`) and invalidate them after mutations to refetch.
+- **Models**: `freezed` + `json_serializable` (`lib/models`). Enums
+  (`lib/core/utils/enums.dart`) are hardcoded to match the backend's wire
+  strings (e.g. `SkillCategory.tech.wire == 'TECH'`).
+- **Auth**: JWT stored in `flutter_secure_storage`
+  (`lib/core/storage/secure_storage_service.dart`). There is no refresh-token
+  endpoint, so token expiry (default 24h) is handled purely by the 401 hook
+  routing back to `/login`.
+- **Routing**: `go_router` with a `StatefulShellRoute` for the four bottom-nav
+  tabs (Matches, Requests, Sessions, Profile) and a redirect based on
+  `authProvider`'s state (`lib/core/router/app_router.dart`).
 
-A few resources to get you started if this is your first Flutter project:
+## Note on `/matches` response shape
 
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
+The API spec handed to this client didn't document the exact JSON shape of
+`GET /matches` / `/matches/mutual` / `/matches/{userId}`. `MatchResult`
+(`lib/models/match_result.dart`) parses defensively, trying several likely
+field-name variants (`user`/`matchedUser`, `theyTeach`/`canTeachYou`/etc.) and
+degrading to empty lists rather than throwing. If the real backend uses
+different keys, adjust the `_firstOf` lookups there — nothing else in the app
+depends on the raw JSON.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-# skillswap-mobile-app
+Similarly `RatingSummary.fromJson` (`lib/models/rating.dart`) tries a few
+common key names (`averageRating`/`averageStars`/`average`, etc.) for
+`GET /users/{userId}/rating-summary`.
+
+## Running
+
+The backend's CORS only allows `localhost:3000`/`8080`, which only matters
+for a Flutter *web* build — mobile/desktop builds aren't subject to CORS.
+
+```bash
+flutter pub get
+
+# Regenerate model code after changing anything under lib/models
+dart run build_runner build --delete-conflicting-outputs
+
+# Android emulator reaches host localhost via 10.0.2.2 (the default below).
+# iOS simulator / macOS desktop can hit localhost directly:
+flutter run --dart-define=API_BASE_URL=http://localhost:8080/api
+
+# Physical device on the same network as the backend:
+flutter run --dart-define=API_BASE_URL=http://<your-lan-ip>:8080/api
+```
+
+Default `API_BASE_URL` (no `--dart-define`) is `http://10.0.2.2:8080/api`,
+tuned for the Android emulator.
