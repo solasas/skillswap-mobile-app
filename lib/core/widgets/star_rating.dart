@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme/app_colors.dart';
+
 /// Read-only star display.
 class StarRatingDisplay extends StatelessWidget {
   const StarRatingDisplay({super.key, required this.stars, this.size = 18});
@@ -16,7 +18,7 @@ class StarRatingDisplay extends StatelessWidget {
         return Icon(
           filled ? Icons.star : Icons.star_border,
           size: size,
-          color: Colors.amber,
+          color: AppColors.star,
         );
       }),
     );
@@ -40,7 +42,7 @@ class StarRatingInput extends StatelessWidget {
           onPressed: () => onChanged(starIndex),
           icon: Icon(
             starIndex <= value ? Icons.star : Icons.star_border,
-            color: Colors.amber,
+            color: AppColors.star,
             size: 34,
           ),
         );

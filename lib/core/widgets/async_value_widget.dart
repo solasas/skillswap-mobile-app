@@ -41,18 +41,24 @@ class _ErrorView extends StatelessWidget {
   Widget build(BuildContext context) {
     final err = error;
     final message = err is ApiException ? err.message : 'Something went wrong.';
+    final scheme = Theme.of(context).colorScheme;
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline, size: 48, color: Colors.redAccent),
-            const SizedBox(height: 12),
-            Text(message, textAlign: TextAlign.center),
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(color: scheme.errorContainer, shape: BoxShape.circle),
+              child: Icon(Icons.priority_high_rounded, size: 30, color: scheme.error),
+            ),
+            const SizedBox(height: 14),
+            Text(message, textAlign: TextAlign.center, style: Theme.of(context).textTheme.bodyMedium),
             if (onRetry != null) ...[
               const SizedBox(height: 16),
-              FilledButton(onPressed: onRetry, child: const Text('Retry')),
+              OutlinedButton(onPressed: onRetry, child: const Text('Retry')),
             ],
           ],
         ),

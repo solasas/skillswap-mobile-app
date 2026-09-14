@@ -3,10 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../core/widgets/async_value_widget.dart';
+import '../../core/widgets/section_label.dart';
+import '../../core/widgets/star_rating.dart';
 import '../../models/match_result.dart';
 import '../../providers/matches_provider.dart';
 import '../../providers/ratings_provider.dart';
-import '../../core/widgets/star_rating.dart';
 
 class MatchDetailScreen extends ConsumerWidget {
   const MatchDetailScreen({super.key, required this.userId});
@@ -52,24 +53,38 @@ class _MatchDetailBody extends ConsumerWidget {
           children: [
             CircleAvatar(
               radius: 32,
-              child: Text(match.user.name.isNotEmpty ? match.user.name[0].toUpperCase() : '?'),
+              child: Text(
+                match.user.name.isNotEmpty
+                    ? match.user.name[0].toUpperCase()
+                    : '?',
+              ),
             ),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(match.user.name, style: Theme.of(context).textTheme.titleLarge),
+                  Text(
+                    match.user.name,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
                   if (match.user.city != null) Text(match.user.city!),
                   const SizedBox(height: 4),
                   summaryAsync.when(
                     data: (s) => s.totalRatings == 0
-                        ? const Text('No ratings yet', style: TextStyle(color: Colors.grey))
-                        : Row(children: [
-                            StarRatingDisplay(stars: s.averageStars),
-                            const SizedBox(width: 6),
-                            Text('${s.averageStars.toStringAsFixed(1)} (${s.totalRatings})'),
-                          ]),
+                        ? Text(
+                            'No ratings yet',
+                            style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+                          )
+                        : Row(
+                            children: [
+                              StarRatingDisplay(stars: s.averageStars),
+                              const SizedBox(width: 6),
+                              Text(
+                                '${s.averageStars.toStringAsFixed(1)} (${s.totalRatings})',
+                              ),
+                            ],
+                          ),
                     loading: () => const SizedBox(height: 18),
                     error: (_, _) => const SizedBox.shrink(),
                   ),
@@ -80,18 +95,22 @@ class _MatchDetailBody extends ConsumerWidget {
         ),
         if (match.user.bio != null) ...[
           const SizedBox(height: 20),
-          Text('About', style: Theme.of(context).textTheme.titleSmall),
+          const SectionLabel('About'),
           const SizedBox(height: 6),
           Text(match.user.bio!),
         ],
         const SizedBox(height: 24),
-        Text('Can teach you', style: Theme.of(context).textTheme.titleSmall),
+        const SectionLabel('Can teach you'),
         const SizedBox(height: 8),
-        _SkillChips(skills: match.skillsTheyCanTeachYou.map((s) => s.name).toList()),
+        _SkillChips(
+          skills: match.skillsTheyCanTeachYou.map((s) => s.name).toList(),
+        ),
         const SizedBox(height: 20),
-        Text('Wants to learn from you', style: Theme.of(context).textTheme.titleSmall),
+        const SectionLabel('Wants to learn from you'),
         const SizedBox(height: 8),
-        _SkillChips(skills: match.skillsYouCanTeachThem.map((s) => s.name).toList()),
+        _SkillChips(
+          skills: match.skillsYouCanTeachThem.map((s) => s.name).toList(),
+        ),
         const SizedBox(height: 20),
         OutlinedButton.icon(
           icon: const Icon(Icons.star_outline),
@@ -111,7 +130,7 @@ class _SkillChips extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (skills.isEmpty) {
-      return const Text('None yet', style: TextStyle(color: Colors.grey));
+      return Text('None yet', style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant));
     }
     return Wrap(
       spacing: 8,

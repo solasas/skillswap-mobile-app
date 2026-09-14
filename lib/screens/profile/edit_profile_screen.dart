@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/network/api_exception.dart';
 import '../../core/widgets/async_value_widget.dart';
+import '../../core/widgets/auth_error_banner.dart';
 import '../../models/user.dart';
 import '../../providers/core_providers.dart';
 import '../../providers/profile_provider.dart';
@@ -45,7 +46,9 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       _error = null;
     });
     try {
-      await ref.read(profileRepositoryProvider).updateMe(
+      await ref
+          .read(profileRepositoryProvider)
+          .updateMe(
             name: _nameController.text.trim(),
             bio: _bioController.text.trim(),
             city: _cityController.text.trim(),
@@ -74,36 +77,36 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
             padding: const EdgeInsets.all(16),
             children: [
               if (_error != null) ...[
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.red.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(_error!, style: const TextStyle(color: Colors.red)),
-                ),
+                AuthErrorBanner(_error!),
                 const SizedBox(height: 16),
               ],
               TextField(
                 controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Name', border: OutlineInputBorder()),
+                decoration: const InputDecoration(labelText: 'Name'),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: _cityController,
-                decoration: const InputDecoration(labelText: 'City', border: OutlineInputBorder()),
+                decoration: const InputDecoration(labelText: 'City'),
               ),
               const SizedBox(height: 16),
               TextField(
                 controller: _bioController,
                 maxLines: 4,
-                decoration: const InputDecoration(labelText: 'Bio', border: OutlineInputBorder()),
+                decoration: const InputDecoration(labelText: 'Bio'),
               ),
               const SizedBox(height: 24),
               FilledButton(
                 onPressed: _submitting ? null : _submit,
                 child: _submitting
-                    ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                    ? SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Theme.of(context).colorScheme.onPrimary,
+                        ),
+                      )
                     : const Text('Save'),
               ),
             ],

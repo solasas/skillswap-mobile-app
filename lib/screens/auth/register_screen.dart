@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/widgets/auth_error_banner.dart';
 import '../../providers/auth_provider.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
@@ -28,7 +29,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    final success = await ref.read(authProvider.notifier).register(
+    final success = await ref
+        .read(authProvider.notifier)
+        .register(
           name: _nameController.text.trim(),
           email: _emailController.text.trim(),
           password: _passwordController.text,
@@ -42,13 +45,14 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   Widget build(BuildContext context) {
     final auth = ref.watch(authProvider);
     final isLoading = auth.status == AuthStatus.authenticating;
+    final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Create account')),
+      appBar: AppBar(),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.symmetric(horizontal: 28),
             child: Form(
               key: _formKey,
               child: ConstrainedBox(
@@ -56,56 +60,69 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Text('Join SkillSwap', style: Theme.of(context).textTheme.headlineSmall),
-                    const SizedBox(height: 4),
                     Text(
-                      'Teach what you know, learn what you love',
-                      style: Theme.of(context).textTheme.bodyMedium,
+                      'Bring a skill,\nleave with one',
+                      style: Theme.of(context).textTheme.headlineSmall,
                     ),
-                    const SizedBox(height: 32),
-                    if (auth.errorMessage != null) ...[
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        decoration: BoxDecoration(
-                          color: Colors.red.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(auth.errorMessage!, style: const TextStyle(color: Colors.red)),
+                    const SizedBox(height: 6),
+                    Text(
+                      'Teach what you know, learn what you love — no money changes hands.',
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: scheme.onSurfaceVariant,
                       ),
+                    ),
+                    const SizedBox(height: 28),
+                    if (auth.errorMessage != null) ...[
+                      AuthErrorBanner(auth.errorMessage!),
                       const SizedBox(height: 16),
                     ],
                     TextFormField(
                       controller: _nameController,
-                      decoration: const InputDecoration(labelText: 'Name', prefixIcon: Icon(Icons.person_outline)),
+                      decoration: const InputDecoration(
+                        labelText: 'Name',
+                        prefixIcon: Icon(Icons.person_outline_rounded),
+                      ),
                       validator: (value) =>
-                          (value == null || value.trim().isEmpty) ? 'Name is required' : null,
+                          (value == null || value.trim().isEmpty)
+                          ? 'Name is required'
+                          : null,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
                     TextFormField(
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
-                      decoration: const InputDecoration(labelText: 'Email', prefixIcon: Icon(Icons.email_outlined)),
+                      decoration: const InputDecoration(
+                        labelText: 'Email',
+                        prefixIcon: Icon(Icons.mail_outline_rounded),
+                      ),
                       validator: (value) {
-                        if (value == null || value.trim().isEmpty) return 'Email is required';
+                        if (value == null || value.trim().isEmpty)
+                          return 'Email is required';
                         if (!value.contains('@')) return 'Enter a valid email';
                         return null;
                       },
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
                     TextFormField(
                       controller: _passwordController,
                       obscureText: _obscure,
                       decoration: InputDecoration(
                         labelText: 'Password',
-                        prefixIcon: const Icon(Icons.lock_outline),
+                        prefixIcon: const Icon(Icons.lock_outline_rounded),
                         suffixIcon: IconButton(
-                          icon: Icon(_obscure ? Icons.visibility_outlined : Icons.visibility_off_outlined),
+                          icon: Icon(
+                            _obscure
+                                ? Icons.visibility_outlined
+                                : Icons.visibility_off_outlined,
+                          ),
                           onPressed: () => setState(() => _obscure = !_obscure),
                         ),
                       ),
                       validator: (value) {
-                        if (value == null || value.isEmpty) return 'Password is required';
-                        if (value.length < 6) return 'Use at least 6 characters';
+                        if (value == null || value.isEmpty)
+                          return 'Password is required';
+                        if (value.length < 6)
+                          return 'Use at least 6 characters';
                         return null;
                       },
                       onFieldSubmitted: (_) => _submit(),
@@ -114,13 +131,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                     FilledButton(
                       onPressed: isLoading ? null : _submit,
                       child: isLoading
-                          ? const SizedBox(
+                          ? SizedBox(
                               height: 20,
                               width: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: scheme.onPrimary,
+                              ),
                             )
-                          : const Text('Create account'),
+                          : const Text('CREATE ACCOUNT'),
                     ),
+                    const SizedBox(height: 24),
                   ],
                 ),
               ),

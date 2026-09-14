@@ -1,18 +1,28 @@
 import 'package:flutter/material.dart';
 
+import '../../core/widgets/brand_mark.dart';
+
 class SplashScreen extends StatelessWidget {
   const SplashScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    final scheme = Theme.of(context).colorScheme;
+    return Scaffold(
       body: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.swap_horiz, size: 64, color: Color(0xFF4F46E5)),
-            SizedBox(height: 16),
-            CircularProgressIndicator(),
+            const BrandMark(size: 72),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: 22,
+              height: 22,
+              child: CircularProgressIndicator(
+                strokeWidth: 2.4,
+                color: scheme.primary,
+              ),
+            ),
           ],
         ),
       ),

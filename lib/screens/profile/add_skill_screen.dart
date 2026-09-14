@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../../core/network/api_exception.dart';
 import '../../core/utils/enums.dart';
 import '../../core/widgets/async_value_widget.dart';
+import '../../core/widgets/auth_error_banner.dart';
+import '../../core/widgets/section_label.dart';
 import '../../models/skill.dart';
 import '../../providers/core_providers.dart';
 import '../../providers/profile_provider.dart';
@@ -53,7 +55,9 @@ class _AddSkillScreenState extends ConsumerState<AddSkillScreen> {
           });
           return;
         }
-        final created = await ref.read(skillsRepositoryProvider).createSkill(
+        final created = await ref
+            .read(skillsRepositoryProvider)
+            .createSkill(
               name: _newSkillNameController.text.trim(),
               category: _newSkillCategory,
               description: _newSkillDescController.text.trim(),
@@ -70,14 +74,14 @@ class _AddSkillScreenState extends ConsumerState<AddSkillScreen> {
         skillId = _selectedSkillId!;
       }
 
-      await ref.read(profileRepositoryProvider).addSkill(
-            skillId: skillId,
-            type: _type,
-            level: _level,
-          );
+      await ref
+          .read(profileRepositoryProvider)
+          .addSkill(skillId: skillId, type: _type, level: _level);
       ref.invalidate(mySkillsProvider);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Skill added!')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Skill added!')));
         context.pop();
       }
     } on ApiException catch (e) {
@@ -97,14 +101,7 @@ class _AddSkillScreenState extends ConsumerState<AddSkillScreen> {
         padding: const EdgeInsets.all(16),
         children: [
           if (_error != null) ...[
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.red.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Text(_error!, style: const TextStyle(color: Colors.red)),
-            ),
+            AuthErrorBanner(_error!),
             const SizedBox(height: 16),
           ],
           SwitchListTile(
@@ -118,30 +115,41 @@ class _AddSkillScreenState extends ConsumerState<AddSkillScreen> {
           if (_creatingNew) ...[
             TextField(
               controller: _newSkillNameController,
-              decoration: const InputDecoration(labelText: 'Skill name', border: OutlineInputBorder()),
+              decoration: const InputDecoration(labelText: 'Skill name'),
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<SkillCategory>(
               initialValue: _newSkillCategory,
-              decoration: const InputDecoration(labelText: 'Category', border: OutlineInputBorder()),
+              decoration: const InputDecoration(labelText: 'Category'),
               items: SkillCategory.values
                   .map((c) => DropdownMenuItem(value: c, child: Text(c.label)))
                   .toList(),
-              onChanged: (value) => setState(() => _newSkillCategory = value ?? SkillCategory.other),
+              onChanged: (value) => setState(
+                () => _newSkillCategory = value ?? SkillCategory.other,
+              ),
             ),
             const SizedBox(height: 16),
             TextField(
               controller: _newSkillDescController,
               maxLines: 2,
-              decoration: const InputDecoration(labelText: 'Description (optional)', border: OutlineInputBorder()),
+              decoration: const InputDecoration(
+                labelText: 'Description (optional)',
+              ),
             ),
           ] else ...[
             DropdownButtonFormField<SkillCategory?>(
               initialValue: _filterCategory,
-              decoration: const InputDecoration(labelText: 'Filter by category', border: OutlineInputBorder()),
+              decoration: const InputDecoration(
+                labelText: 'Filter by category',
+              ),
               items: [
-                const DropdownMenuItem(value: null, child: Text('All categories')),
-                ...SkillCategory.values.map((c) => DropdownMenuItem(value: c, child: Text(c.label))),
+                const DropdownMenuItem(
+                  value: null,
+                  child: Text('All categories'),
+                ),
+                ...SkillCategory.values.map(
+                  (c) => DropdownMenuItem(value: c, child: Text(c.label)),
+                ),
               ],
               onChanged: (value) => setState(() {
                 _filterCategory = value;
@@ -151,41 +159,63 @@ class _AddSkillScreenState extends ConsumerState<AddSkillScreen> {
             const SizedBox(height: 16),
             AsyncValueWidget<List<Skill>>(
               value: skillsAsync,
-              onRetry: () => ref.invalidate(skillsByCategoryProvider(_filterCategory)),
+              onRetry: () =>
+                  ref.invalidate(skillsByCategoryProvider(_filterCategory)),
               data: (skills) => DropdownButtonFormField<int>(
                 initialValue: _selectedSkillId,
-                decoration: const InputDecoration(labelText: 'Skill', border: OutlineInputBorder()),
-                items: skills.map((s) => DropdownMenuItem(value: s.id, child: Text(s.name))).toList(),
+                decoration: const InputDecoration(labelText: 'Skill'),
+                items: skills
+                    .map(
+                      (s) => DropdownMenuItem(value: s.id, child: Text(s.name)),
+                    )
+                    .toList(),
                 onChanged: (value) => setState(() => _selectedSkillId = value),
               ),
             ),
           ],
           const SizedBox(height: 20),
-          Text('I want to...', style: Theme.of(context).textTheme.titleSmall),
+          const SectionLabel('I want to...'),
           const SizedBox(height: 8),
           SegmentedButton<SkillType>(
             segments: const [
-              ButtonSegment(value: SkillType.teach, label: Text('Teach it'), icon: Icon(Icons.school_outlined)),
-              ButtonSegment(value: SkillType.learn, label: Text('Learn it'), icon: Icon(Icons.menu_book_outlined)),
+              ButtonSegment(
+                value: SkillType.teach,
+                label: Text('Teach it'),
+                icon: Icon(Icons.school_outlined),
+              ),
+              ButtonSegment(
+                value: SkillType.learn,
+                label: Text('Learn it'),
+                icon: Icon(Icons.menu_book_outlined),
+              ),
             ],
             selected: {_type},
-            onSelectionChanged: (selection) => setState(() => _type = selection.first),
+            onSelectionChanged: (selection) =>
+                setState(() => _type = selection.first),
           ),
           const SizedBox(height: 20),
-          Text('My level', style: Theme.of(context).textTheme.titleSmall),
+          const SectionLabel('My level'),
           const SizedBox(height: 8),
           SegmentedButton<SkillLevel>(
             segments: SkillLevel.values
                 .map((l) => ButtonSegment(value: l, label: Text(l.label)))
                 .toList(),
             selected: {_level},
-            onSelectionChanged: (selection) => setState(() => _level = selection.first),
+            onSelectionChanged: (selection) =>
+                setState(() => _level = selection.first),
           ),
           const SizedBox(height: 24),
           FilledButton(
             onPressed: _submitting ? null : _submit,
             child: _submitting
-                ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                ? SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: Theme.of(context).colorScheme.onPrimary,
+                    ),
+                  )
                 : const Text('Add skill'),
           ),
         ],

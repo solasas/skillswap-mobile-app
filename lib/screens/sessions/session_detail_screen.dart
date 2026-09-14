@@ -18,7 +18,8 @@ class SessionDetailScreen extends ConsumerStatefulWidget {
   final int sessionId;
 
   @override
-  ConsumerState<SessionDetailScreen> createState() => _SessionDetailScreenState();
+  ConsumerState<SessionDetailScreen> createState() =>
+      _SessionDetailScreenState();
 }
 
 class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
@@ -31,7 +32,10 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
       ref.invalidate(sessionDetailProvider(widget.sessionId));
       ref.invalidate(mySessionsProvider);
     } on ApiException catch (e) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+      if (mounted)
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.message)));
     } finally {
       if (mounted) setState(() => _acting = false);
     }
@@ -54,7 +58,8 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
 
   Widget _buildBody(BuildContext context, Session session, int? myId) {
     final exchange = session.exchange;
-    final isParticipant = exchange.requester.id == myId || exchange.receiver.id == myId;
+    final isParticipant =
+        exchange.requester.id == myId || exchange.receiver.id == myId;
     final isScheduler = session.scheduledBy.id == myId;
     final repo = ref.read(sessionsRepositoryProvider);
 
@@ -63,13 +68,24 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
       children: [
         Row(
           children: [
-            Expanded(child: Text(DateFormat.yMMMEd().add_jm().format(session.dateTime), style: Theme.of(context).textTheme.titleLarge)),
+            Expanded(
+              child: Text(
+                DateFormat.yMMMEd().add_jm().format(session.dateTime),
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+            ),
             StatusBadge.session(session.status),
           ],
         ),
         const SizedBox(height: 16),
-        _InfoRow(label: 'Exchange', value: '${exchange.offeredSkill.name} ↔ ${exchange.wantedSkill.name}'),
-        _InfoRow(label: 'Duration', value: '${session.durationMinutes} minutes'),
+        _InfoRow(
+          label: 'Exchange',
+          value: '${exchange.offeredSkill.name} ↔ ${exchange.wantedSkill.name}',
+        ),
+        _InfoRow(
+          label: 'Duration',
+          value: '${session.durationMinutes} minutes',
+        ),
         _InfoRow(label: 'Mode', value: session.mode.label),
         if (session.meetLink != null && session.meetLink!.isNotEmpty)
           _InfoRow(label: 'Meeting link', value: session.meetLink!),
@@ -85,7 +101,9 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
               if (isScheduler) ...[
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: _acting ? null : () => _act(() => repo.cancel(session.id)),
+                    onPressed: _acting
+                        ? null
+                        : () => _act(() => repo.cancel(session.id)),
                     child: const Text('Cancel'),
                   ),
                 ),
@@ -93,7 +111,9 @@ class _SessionDetailScreenState extends ConsumerState<SessionDetailScreen> {
               ],
               Expanded(
                 child: FilledButton(
-                  onPressed: _acting ? null : () => _act(() => repo.complete(session.id)),
+                  onPressed: _acting
+                      ? null
+                      : () => _act(() => repo.complete(session.id)),
                   child: const Text('Mark completed'),
                 ),
               ),
@@ -125,7 +145,13 @@ class _InfoRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SizedBox(width: 110, child: Text(label, style: TextStyle(color: Theme.of(context).colorScheme.outline))),
+          SizedBox(
+            width: 110,
+            child: Text(
+              label,
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant),
+            ),
+          ),
           Expanded(child: Text(value)),
         ],
       ),

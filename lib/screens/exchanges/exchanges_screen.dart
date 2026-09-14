@@ -38,14 +38,23 @@ class _ExchangesScreenState extends ConsumerState<ExchangesScreen>
         title: const Text('Swap requests'),
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [Tab(text: 'Received'), Tab(text: 'Sent')],
+          tabs: const [
+            Tab(text: 'Received'),
+            Tab(text: 'Sent'),
+          ],
         ),
       ),
       body: TabBarView(
         controller: _tabController,
         children: [
-          _ExchangeList(provider: receivedExchangesProvider, emptyMessage: 'No requests received yet.'),
-          _ExchangeList(provider: sentExchangesProvider, emptyMessage: "You haven't sent any requests yet."),
+          _ExchangeList(
+            provider: receivedExchangesProvider,
+            emptyMessage: 'No requests received yet.',
+          ),
+          _ExchangeList(
+            provider: sentExchangesProvider,
+            emptyMessage: "You haven't sent any requests yet.",
+          ),
         ],
       ),
     );
@@ -79,7 +88,8 @@ class _ExchangeList extends ConsumerWidget {
             padding: const EdgeInsets.all(16),
             itemCount: exchanges.length,
             separatorBuilder: (_, _) => const SizedBox(height: 12),
-            itemBuilder: (context, index) => _ExchangeCard(exchange: exchanges[index]),
+            itemBuilder: (context, index) =>
+                _ExchangeCard(exchange: exchanges[index]),
           );
         },
       ),

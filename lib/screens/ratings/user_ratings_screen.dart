@@ -34,16 +34,24 @@ class UserRatingsScreen extends ConsumerWidget {
                   padding: const EdgeInsets.all(20),
                   child: Column(
                     children: [
-                      Text(summary.averageStars.toStringAsFixed(1), style: Theme.of(context).textTheme.displaySmall),
+                      Text(
+                        summary.averageStars.toStringAsFixed(1),
+                        style: Theme.of(context).textTheme.displaySmall,
+                      ),
                       const SizedBox(height: 4),
                       StarRatingDisplay(stars: summary.averageStars, size: 22),
                       const SizedBox(height: 4),
-                      Text('${summary.totalRatings} rating${summary.totalRatings == 1 ? '' : 's'}'),
+                      Text(
+                        '${summary.totalRatings} rating${summary.totalRatings == 1 ? '' : 's'}',
+                      ),
                     ],
                   ),
                 ),
               ),
-              loading: () => const SizedBox(height: 140, child: Center(child: CircularProgressIndicator())),
+              loading: () => const SizedBox(
+                height: 140,
+                child: Center(child: CircularProgressIndicator()),
+              ),
               error: (e, _) => const SizedBox.shrink(),
             ),
             const SizedBox(height: 20),
@@ -52,38 +60,54 @@ class UserRatingsScreen extends ConsumerWidget {
               onRetry: () => ref.invalidate(userRatingsProvider(userId)),
               data: (ratings) {
                 if (ratings.isEmpty) {
-                  return const EmptyState(icon: Icons.star_border, message: 'No reviews yet.');
+                  return const EmptyState(
+                    icon: Icons.star_border,
+                    message: 'No reviews yet.',
+                  );
                 }
                 return Column(
                   children: ratings
-                      .map((r) => Card(
-                            child: Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Text(r.ratedBy.name, style: Theme.of(context).textTheme.titleSmall),
-                                      StarRatingDisplay(stars: r.stars.toDouble()),
-                                    ],
-                                  ),
-                                  if (r.review != null && r.review!.isNotEmpty) ...[
-                                    const SizedBox(height: 8),
-                                    Text(r.review!),
-                                  ],
-                                  if (r.createdAt != null) ...[
-                                    const SizedBox(height: 6),
+                      .map(
+                        (r) => Card(
+                          child: Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
                                     Text(
-                                      DateFormat.yMMMd().format(r.createdAt!),
-                                      style: Theme.of(context).textTheme.bodySmall,
+                                      r.ratedBy.name,
+                                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                    ),
+                                    StarRatingDisplay(
+                                      stars: r.stars.toDouble(),
                                     ),
                                   ],
+                                ),
+                                if (r.review != null &&
+                                    r.review!.isNotEmpty) ...[
+                                  const SizedBox(height: 8),
+                                  Text(r.review!),
                                 ],
-                              ),
+                                if (r.createdAt != null) ...[
+                                  const SizedBox(height: 6),
+                                  Text(
+                                    DateFormat.yMMMd().format(r.createdAt!),
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodySmall,
+                                  ),
+                                ],
+                              ],
                             ),
-                          ))
+                          ),
+                        ),
+                      )
                       .toList(),
                 );
               },

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/network/api_exception.dart';
 import '../../core/utils/enums.dart';
 import '../../core/widgets/async_value_widget.dart';
+import '../../core/widgets/auth_error_banner.dart';
 import '../../core/widgets/star_rating.dart';
 import '../../models/session.dart';
 import '../../providers/auth_provider.dart';
@@ -38,13 +39,17 @@ class _RateSessionScreenState extends ConsumerState<RateSessionScreen> {
       _error = null;
     });
     try {
-      await ref.read(ratingsRepositoryProvider).rateSession(
+      await ref
+          .read(ratingsRepositoryProvider)
+          .rateSession(
             sessionId: widget.sessionId,
             stars: _stars,
             review: _reviewController.text.trim(),
           );
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Rating submitted!')));
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Rating submitted!')));
         context.pop();
       }
     } on ApiException catch (e) {
@@ -68,43 +73,55 @@ class _RateSessionScreenState extends ConsumerState<RateSessionScreen> {
           if (session.status != SessionStatus.completed) {
             return const Padding(
               padding: EdgeInsets.all(24),
-              child: Text('You can only rate a session once it has been completed.'),
+              child: Text(
+                'You can only rate a session once it has been completed.',
+              ),
             );
           }
           final exchange = session.exchange;
-          final other = exchange.requester.id == myId ? exchange.receiver : exchange.requester;
+          final other = exchange.requester.id == myId
+              ? exchange.receiver
+              : exchange.requester;
 
           return ListView(
             padding: const EdgeInsets.all(24),
             children: [
-              Text('Rate ${other.name}', style: Theme.of(context).textTheme.titleLarge, textAlign: TextAlign.center),
+              Text(
+                'Rate ${other.name}',
+                style: Theme.of(context).textTheme.titleLarge,
+                textAlign: TextAlign.center,
+              ),
               const SizedBox(height: 24),
               if (_error != null) ...[
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.red.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(_error!, style: const TextStyle(color: Colors.red)),
-                ),
+                AuthErrorBanner(_error!),
                 const SizedBox(height: 16),
               ],
-              Center(child: StarRatingInput(value: _stars, onChanged: (v) => setState(() => _stars = v))),
+              Center(
+                child: StarRatingInput(
+                  value: _stars,
+                  onChanged: (v) => setState(() => _stars = v),
+                ),
+              ),
               const SizedBox(height: 24),
               TextField(
                 controller: _reviewController,
                 maxLines: 4,
                 decoration: const InputDecoration(
                   labelText: 'Review (optional)',
-                  border: OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 24),
               FilledButton(
                 onPressed: _submitting ? null : _submit,
                 child: _submitting
-                    ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                    ? SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: Theme.of(context).colorScheme.onPrimary,
+                        ),
+                      )
                     : const Text('Submit rating'),
               ),
             ],

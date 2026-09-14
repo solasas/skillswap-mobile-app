@@ -44,3 +44,26 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  # Bundled locally (not fetched via google_fonts at runtime) so the app's
+  # typography works offline and isn't subject to platform sandbox/network
+  # restrictions blocking a first-launch font download.
+  fonts:
+    - family: Sora
+      fonts:
+        - asset: assets/fonts/Sora-Variable.ttf
+          weight: 400
+        - asset: assets/fonts/Sora-Variable.ttf
+          weight: 600
+        - asset: assets/fonts/Sora-Variable.ttf
+          weight: 700
+        - asset: assets/fonts/Sora-Variable.ttf
+          weight: 800
+    - family: Manrope
+      fonts:
+        - asset: assets/fonts/Manrope-Variable.ttf
+          weight: 500
+        - asset: assets/fonts/Manrope-Variable.ttf
+          weight: 600
+        - asset: assets/fonts/Manrope-Variable.ttf
+          weight: 700

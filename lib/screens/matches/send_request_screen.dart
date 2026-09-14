@@ -4,6 +4,8 @@ import 'package:go_router/go_router.dart';
 
 import '../../core/network/api_exception.dart';
 import '../../core/widgets/async_value_widget.dart';
+import '../../core/widgets/auth_error_banner.dart';
+import '../../core/widgets/section_label.dart';
 import '../../models/skill.dart';
 import '../../models/user_skill.dart';
 import '../../providers/auth_provider.dart';
@@ -41,7 +43,9 @@ class _SendRequestScreenState extends ConsumerState<SendRequestScreen> {
       return;
     }
     if (_offeredSkillId == null || _wantedSkillId == null) {
-      setState(() => _error = 'Pick a skill to offer and a skill you want to learn.');
+      setState(
+        () => _error = 'Pick a skill to offer and a skill you want to learn.',
+      );
       return;
     }
     setState(() {
@@ -49,7 +53,9 @@ class _SendRequestScreenState extends ConsumerState<SendRequestScreen> {
       _error = null;
     });
     try {
-      await ref.read(exchangesRepositoryProvider).createExchange(
+      await ref
+          .read(exchangesRepositoryProvider)
+          .createExchange(
             receiverId: widget.userId,
             offeredSkillId: _offeredSkillId!,
             wantedSkillId: _wantedSkillId!,
@@ -57,9 +63,9 @@ class _SendRequestScreenState extends ConsumerState<SendRequestScreen> {
           );
       invalidateExchanges(ref);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Swap request sent!')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Swap request sent!')));
         context.pop();
         context.pop();
       }
@@ -102,44 +108,43 @@ class _SendRequestScreenState extends ConsumerState<SendRequestScreen> {
   }) {
     final teachSkills = mySkills.where((s) => s.type.name == 'teach').toList();
     final offeredOptions = teachSkills.isNotEmpty ? teachSkills : mySkills;
+    final mutedStyle = TextStyle(color: Theme.of(context).colorScheme.onSurfaceVariant);
 
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
         if (_error != null) ...[
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: Colors.red.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Text(_error!, style: const TextStyle(color: Colors.red)),
-          ),
+          AuthErrorBanner(_error!),
           const SizedBox(height: 16),
         ],
-        Text('A skill you can offer', style: Theme.of(context).textTheme.titleSmall),
+        const SectionLabel('A skill you can offer'),
         const SizedBox(height: 8),
         if (offeredOptions.isEmpty)
-          const Text('Add a skill to your profile first.', style: TextStyle(color: Colors.grey))
+          Text('Add a skill to your profile first.', style: mutedStyle)
         else
           DropdownButtonFormField<int>(
             initialValue: _offeredSkillId,
-            decoration: const InputDecoration(border: OutlineInputBorder()),
+            decoration: const InputDecoration(),
             hint: const Text('Choose a skill you teach'),
             items: offeredOptions
-                .map((us) => DropdownMenuItem(value: us.skill.id, child: Text(us.skill.name)))
+                .map(
+                  (us) => DropdownMenuItem(
+                    value: us.skill.id,
+                    child: Text(us.skill.name),
+                  ),
+                )
                 .toList(),
             onChanged: (value) => setState(() => _offeredSkillId = value),
           ),
         const SizedBox(height: 20),
-        Text('A skill you want to learn from them', style: Theme.of(context).textTheme.titleSmall),
+        const SectionLabel('A skill you want to learn from them'),
         const SizedBox(height: 8),
         if (theirSkills.isEmpty)
-          const Text('No listed skills to choose from.', style: TextStyle(color: Colors.grey))
+          Text('No listed skills to choose from.', style: mutedStyle)
         else
           DropdownButtonFormField<int>(
             initialValue: _wantedSkillId,
-            decoration: const InputDecoration(border: OutlineInputBorder()),
+            decoration: const InputDecoration(),
             hint: const Text('Choose one of their skills'),
             items: theirSkills
                 .map((s) => DropdownMenuItem(value: s.id, child: Text(s.name)))
@@ -147,13 +152,12 @@ class _SendRequestScreenState extends ConsumerState<SendRequestScreen> {
             onChanged: (value) => setState(() => _wantedSkillId = value),
           ),
         const SizedBox(height: 20),
-        Text('Message (optional)', style: Theme.of(context).textTheme.titleSmall),
+        const SectionLabel('Message (optional)'),
         const SizedBox(height: 8),
         TextField(
           controller: _messageController,
           maxLines: 3,
           decoration: const InputDecoration(
-            border: OutlineInputBorder(),
             hintText: "Introduce yourself or suggest a time...",
           ),
         ),
@@ -161,10 +165,13 @@ class _SendRequestScreenState extends ConsumerState<SendRequestScreen> {
         FilledButton(
           onPressed: _submitting ? null : _submit,
           child: _submitting
-              ? const SizedBox(
+              ? SizedBox(
                   height: 20,
                   width: 20,
-                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Theme.of(context).colorScheme.onPrimary,
+                  ),
                 )
               : const Text('Send request'),
         ),

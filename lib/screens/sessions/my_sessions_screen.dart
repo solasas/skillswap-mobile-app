@@ -30,12 +30,14 @@ class MySessionsScreen extends ConsumerWidget {
                   SizedBox(height: 120),
                   EmptyState(
                     icon: Icons.calendar_today_outlined,
-                    message: 'No sessions yet.\nSchedule one from an accepted swap request.',
+                    message:
+                        'No sessions yet.\nSchedule one from an accepted swap request.',
                   ),
                 ],
               );
             }
-            final sorted = [...sessions]..sort((a, b) => b.dateTime.compareTo(a.dateTime));
+            final sorted = [...sessions]
+              ..sort((a, b) => b.dateTime.compareTo(a.dateTime));
             return ListView.separated(
               padding: const EdgeInsets.all(16),
               itemCount: sorted.length,
@@ -45,8 +47,14 @@ class MySessionsScreen extends ConsumerWidget {
                 return Card(
                   child: ListTile(
                     onTap: () => context.push('/sessions/${session.id}'),
-                    leading: Icon(session.mode == SessionMode.online ? Icons.videocam_outlined : Icons.place_outlined),
-                    title: Text(DateFormat.yMMMd().add_jm().format(session.dateTime)),
+                    leading: Icon(
+                      session.mode == SessionMode.online
+                          ? Icons.videocam_outlined
+                          : Icons.place_outlined,
+                    ),
+                    title: Text(
+                      DateFormat.yMMMd().add_jm().format(session.dateTime),
+                    ),
                     subtitle: Text(
                       '${session.exchange.offeredSkill.name} ↔ ${session.exchange.wantedSkill.name}\n${session.durationMinutes} min · ${session.mode.label}',
                     ),

@@ -6,6 +6,7 @@ import '../../core/network/api_exception.dart';
 import '../../core/utils/enums.dart';
 import '../../core/widgets/async_value_widget.dart';
 import '../../core/widgets/empty_state.dart';
+import '../../core/widgets/section_label.dart';
 import '../../models/user.dart';
 import '../../models/user_skill.dart';
 import '../../providers/auth_provider.dart';
@@ -51,8 +52,14 @@ class ProfileScreen extends ConsumerWidget {
         title: const Text('Log out?'),
         content: const Text('You will need to sign in again to continue.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
-          TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('Log out')),
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Log out'),
+          ),
         ],
       ),
     );
@@ -76,14 +83,25 @@ class _ProfileBody extends ConsumerWidget {
       children: [
         Row(
           children: [
-            CircleAvatar(radius: 32, child: Text(user.name.isNotEmpty ? user.name[0].toUpperCase() : '?')),
+            CircleAvatar(
+              radius: 32,
+              child: Text(
+                user.name.isNotEmpty ? user.name[0].toUpperCase() : '?',
+              ),
+            ),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(user.name, style: Theme.of(context).textTheme.titleLarge),
-                  Text(user.email, style: Theme.of(context).textTheme.bodySmall),
+                  Text(
+                    user.name,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  Text(
+                    user.email,
+                    style: Theme.of(context).textTheme.bodySmall,
+                  ),
                   if (user.city != null) Text(user.city!),
                 ],
               ),
@@ -108,16 +126,13 @@ class _ProfileBody extends ConsumerWidget {
           ),
         ),
         const SizedBox(height: 12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text('My skills', style: Theme.of(context).textTheme.titleMedium),
-            TextButton.icon(
-              icon: const Icon(Icons.add),
-              label: const Text('Add'),
-              onPressed: () => context.push('/profile/skills/add'),
-            ),
-          ],
+        SectionLabel(
+          'My skills',
+          trailing: TextButton.icon(
+            icon: const Icon(Icons.add, size: 18),
+            label: const Text('Add'),
+            onPressed: () => context.push('/profile/skills/add'),
+          ),
         ),
         const SizedBox(height: 8),
         AsyncValueWidget<List<UserSkill>>(
@@ -125,7 +140,10 @@ class _ProfileBody extends ConsumerWidget {
           onRetry: () => ref.invalidate(mySkillsProvider),
           data: (skills) {
             if (skills.isEmpty) {
-              return const EmptyState(icon: Icons.school_outlined, message: 'No skills added yet.');
+              return const EmptyState(
+                icon: Icons.school_outlined,
+                message: 'No skills added yet.',
+              );
             }
             return Column(
               children: skills.map((us) => _SkillTile(userSkill: us)).toList(),
@@ -146,18 +164,28 @@ class _SkillTile extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
       child: ListTile(
-        leading: Icon(userSkill.type.name == 'teach' ? Icons.school_outlined : Icons.menu_book_outlined),
+        leading: Icon(
+          userSkill.type.name == 'teach'
+              ? Icons.school_outlined
+              : Icons.menu_book_outlined,
+        ),
         title: Text(userSkill.skill.name),
-        subtitle: Text('${userSkill.type.label} · ${userSkill.level.label} · ${userSkill.skill.category.label}'),
+        subtitle: Text(
+          '${userSkill.type.label} · ${userSkill.level.label} · ${userSkill.skill.category.label}',
+        ),
         trailing: IconButton(
           icon: const Icon(Icons.delete_outline),
           onPressed: () async {
             try {
-              await ref.read(profileRepositoryProvider).deleteSkill(userSkill.id);
+              await ref
+                  .read(profileRepositoryProvider)
+                  .deleteSkill(userSkill.id);
               ref.invalidate(mySkillsProvider);
             } on ApiException catch (e) {
               if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.message)));
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(SnackBar(content: Text(e.message)));
               }
             }
           },

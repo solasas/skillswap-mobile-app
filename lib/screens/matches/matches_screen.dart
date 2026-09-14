@@ -37,7 +37,10 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen>
         title: const Text('Matches'),
         bottom: TabBar(
           controller: _tabController,
-          tabs: const [Tab(text: 'All'), Tab(text: 'Mutual')],
+          tabs: const [
+            Tab(text: 'All'),
+            Tab(text: 'Mutual'),
+          ],
         ),
       ),
       body: TabBarView(
@@ -71,7 +74,8 @@ class _MatchList extends ConsumerWidget {
                 SizedBox(height: 120),
                 EmptyState(
                   icon: Icons.people_outline,
-                  message: 'No matches yet. Add more skills to your profile\nto find people to swap with.',
+                  message:
+                      'No matches yet. Add more skills to your profile\nto find people to swap with.',
                 ),
               ],
             );
@@ -108,7 +112,11 @@ class _MatchCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 26,
-                child: Text(match.user.name.isNotEmpty ? match.user.name[0].toUpperCase() : '?'),
+                child: Text(
+                  match.user.name.isNotEmpty
+                      ? match.user.name[0].toUpperCase()
+                      : '?',
+                ),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -118,22 +126,37 @@ class _MatchCard extends StatelessWidget {
                     Row(
                       children: [
                         Expanded(
-                          child: Text(match.user.name, style: Theme.of(context).textTheme.titleMedium),
+                          child: Text(
+                            match.user.name,
+                            style: Theme.of(context).textTheme.titleMedium,
+                          ),
                         ),
                         if (match.isMutual)
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 3,
+                            ),
                             decoration: BoxDecoration(
-                              color: Colors.green.withValues(alpha: 0.14),
+                              color: Theme.of(context).colorScheme.primaryContainer,
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            child: const Text('Mutual', style: TextStyle(color: Colors.green, fontSize: 11, fontWeight: FontWeight.w600)),
+                            child: Text(
+                              'MUTUAL',
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                                    letterSpacing: 0.4,
+                                  ),
+                            ),
                           ),
                       ],
                     ),
                     if (match.user.city != null) ...[
                       const SizedBox(height: 2),
-                      Text(match.user.city!, style: Theme.of(context).textTheme.bodySmall),
+                      Text(
+                        match.user.city!,
+                        style: Theme.of(context).textTheme.bodySmall,
+                      ),
                     ],
                     if (match.skillsTheyCanTeachYou.isNotEmpty) ...[
                       const SizedBox(height: 6),

@@ -47,13 +47,16 @@ flutter pub get
 # Regenerate model code after changing anything under lib/models
 dart run build_runner build --delete-conflicting-outputs
 
-# Android emulator reaches host localhost via 10.0.2.2 (the default below).
-# iOS simulator / macOS desktop can hit localhost directly:
-flutter run --dart-define=API_BASE_URL=http://localhost:8080/api
-
-# Physical device on the same network as the backend:
-flutter run --dart-define=API_BASE_URL=http://<your-lan-ip>:8080/api
+flutter run
 ```
 
-Default `API_BASE_URL` (no `--dart-define`) is `http://10.0.2.2:8080/api`,
-tuned for the Android emulator.
+`ApiConstants.baseUrl` (`lib/core/network/api_constants.dart`) picks a sane
+default per platform with no flags needed: `http://10.0.2.2:8080/api` on the
+Android emulator (the only target where plain `localhost` doesn't reach the
+host machine), `http://localhost:8080/api` everywhere else (iOS simulator,
+macOS/Windows/Linux desktop, web). For a physical device on the same
+network as the backend, override it explicitly:
+
+```bash
+flutter run --dart-define=API_BASE_URL=http://<your-lan-ip>:8080/api
+```
