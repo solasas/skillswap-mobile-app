@@ -27,6 +27,8 @@ mixin _$User {
   String? get bio => throw _privateConstructorUsedError;
   String? get city => throw _privateConstructorUsedError;
   String? get role => throw _privateConstructorUsedError;
+  double? get averageRating => throw _privateConstructorUsedError;
+  int? get totalRatings => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
   DateTime? get updatedAt => throw _privateConstructorUsedError;
 
@@ -51,6 +53,8 @@ abstract class $UserCopyWith<$Res> {
     String? bio,
     String? city,
     String? role,
+    double? averageRating,
+    int? totalRatings,
     DateTime? createdAt,
     DateTime? updatedAt,
   });
@@ -77,6 +81,8 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
     Object? bio = freezed,
     Object? city = freezed,
     Object? role = freezed,
+    Object? averageRating = freezed,
+    Object? totalRatings = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
   }) {
@@ -106,6 +112,14 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
                 ? _value.role
                 : role // ignore: cast_nullable_to_non_nullable
                       as String?,
+            averageRating: freezed == averageRating
+                ? _value.averageRating
+                : averageRating // ignore: cast_nullable_to_non_nullable
+                      as double?,
+            totalRatings: freezed == totalRatings
+                ? _value.totalRatings
+                : totalRatings // ignore: cast_nullable_to_non_nullable
+                      as int?,
             createdAt: freezed == createdAt
                 ? _value.createdAt
                 : createdAt // ignore: cast_nullable_to_non_nullable
@@ -135,6 +149,8 @@ abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
     String? bio,
     String? city,
     String? role,
+    double? averageRating,
+    int? totalRatings,
     DateTime? createdAt,
     DateTime? updatedAt,
   });
@@ -158,6 +174,8 @@ class __$$UserImplCopyWithImpl<$Res>
     Object? bio = freezed,
     Object? city = freezed,
     Object? role = freezed,
+    Object? averageRating = freezed,
+    Object? totalRatings = freezed,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
   }) {
@@ -187,6 +205,14 @@ class __$$UserImplCopyWithImpl<$Res>
             ? _value.role
             : role // ignore: cast_nullable_to_non_nullable
                   as String?,
+        averageRating: freezed == averageRating
+            ? _value.averageRating
+            : averageRating // ignore: cast_nullable_to_non_nullable
+                  as double?,
+        totalRatings: freezed == totalRatings
+            ? _value.totalRatings
+            : totalRatings // ignore: cast_nullable_to_non_nullable
+                  as int?,
         createdAt: freezed == createdAt
             ? _value.createdAt
             : createdAt // ignore: cast_nullable_to_non_nullable
@@ -210,6 +236,8 @@ class _$UserImpl implements _User {
     this.bio,
     this.city,
     this.role,
+    this.averageRating,
+    this.totalRatings,
     this.createdAt,
     this.updatedAt,
   });
@@ -230,13 +258,17 @@ class _$UserImpl implements _User {
   @override
   final String? role;
   @override
+  final double? averageRating;
+  @override
+  final int? totalRatings;
+  @override
   final DateTime? createdAt;
   @override
   final DateTime? updatedAt;
 
   @override
   String toString() {
-    return 'User(id: $id, name: $name, email: $email, bio: $bio, city: $city, role: $role, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'User(id: $id, name: $name, email: $email, bio: $bio, city: $city, role: $role, averageRating: $averageRating, totalRatings: $totalRatings, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -250,6 +282,10 @@ class _$UserImpl implements _User {
             (identical(other.bio, bio) || other.bio == bio) &&
             (identical(other.city, city) || other.city == city) &&
             (identical(other.role, role) || other.role == role) &&
+            (identical(other.averageRating, averageRating) ||
+                other.averageRating == averageRating) &&
+            (identical(other.totalRatings, totalRatings) ||
+                other.totalRatings == totalRatings) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
@@ -266,6 +302,8 @@ class _$UserImpl implements _User {
     bio,
     city,
     role,
+    averageRating,
+    totalRatings,
     createdAt,
     updatedAt,
   );
@@ -292,6 +330,8 @@ abstract class _User implements User {
     final String? bio,
     final String? city,
     final String? role,
+    final double? averageRating,
+    final int? totalRatings,
     final DateTime? createdAt,
     final DateTime? updatedAt,
   }) = _$UserImpl;
@@ -310,6 +350,10 @@ abstract class _User implements User {
   String? get city;
   @override
   String? get role;
+  @override
+  double? get averageRating;
+  @override
+  int? get totalRatings;
   @override
   DateTime? get createdAt;
   @override

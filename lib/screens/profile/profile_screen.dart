@@ -22,7 +22,7 @@ class ProfileScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Profile'),
+        automaticallyImplyLeading: false,
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -123,6 +123,24 @@ class _ProfileBody extends ConsumerWidget {
             icon: const Icon(Icons.star_outline),
             label: const Text('My reputation'),
             onPressed: () => context.push('/users/${user.id}/ratings'),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: TextButton.icon(
+            icon: const Icon(Icons.schedule),
+            label: const Text('Availability'),
+            onPressed: () => context.push('/profile/availability'),
+          ),
+        ),
+        const SizedBox(height: 12),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: TextButton.icon(
+            icon: const Icon(Icons.lock_outline),
+            label: const Text('Change password'),
+            onPressed: () => context.push('/profile/change-password'),
           ),
         ),
         const SizedBox(height: 12),

@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../core/utils/enums.dart';
 import '../../core/widgets/async_value_widget.dart';
 import '../../core/widgets/section_label.dart';
 import '../../core/widgets/star_rating.dart';
 import '../../models/match_result.dart';
+import '../../providers/availability_provider.dart';
 import '../../providers/matches_provider.dart';
 import '../../providers/ratings_provider.dart';
 
@@ -18,7 +20,16 @@ class MatchDetailScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final matchAsync = ref.watch(matchDetailProvider(userId));
     return Scaffold(
-      appBar: AppBar(title: const Text('Profile')),
+      appBar: AppBar(
+        title: const Text('Profile'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.chat_bubble_outline),
+            onPressed: () => context.push('/messages/$userId'),
+            tooltip: 'Message',
+          ),
+        ],
+      ),
       body: AsyncValueWidget<MatchResult>(
         value: matchAsync,
         onRetry: () => ref.invalidate(matchDetailProvider(userId)),
@@ -110,6 +121,62 @@ class _MatchDetailBody extends ConsumerWidget {
         const SizedBox(height: 8),
         _SkillChips(
           skills: match.skillsYouCanTeachThem.map((s) => s.name).toList(),
+        ),
+        const SizedBox(height: 20),
+        const SectionLabel('Weekly availability'),
+        const SizedBox(height: 8),
+        Consumer(
+          builder: (context, ref, _) {
+            final availabilityAsync = ref.watch(userAvailabilityProvider(match.user.id));
+            final theme = Theme.of(context);
+            return availabilityAsync.when(
+              data: (slots) {
+                if (slots.isEmpty) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Text(
+                      'No availability listed',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  );
+                }
+                return Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: slots
+                      .map(
+                        (slot) => Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.primaryContainer.withValues(alpha: 0.6),
+                            border: Border.all(
+                              color: theme.colorScheme.primary.withValues(alpha: 0.2),
+                            ),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          child: Text(
+                            '${slot.dayOfWeek.label} · ${slot.startTime.substring(0, 5)} – ${slot.endTime.substring(0, 5)}',
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              color: theme.colorScheme.onPrimaryContainer,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      )
+                      .toList(),
+                );
+              },
+              loading: () => const SizedBox(height: 18),
+              error: (_, _) => Text(
+                'Error loading availability',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: theme.colorScheme.error,
+                ),
+              ),
+            );
+          },
         ),
         const SizedBox(height: 20),
         OutlinedButton.icon(

@@ -51,7 +51,30 @@ class _ExchangeDetailScreenState extends ConsumerState<ExchangeDetailScreen> {
     final myId = ref.watch(authProvider).userId;
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Swap request')),
+      appBar: AppBar(
+        title: const Text('Swap request'),
+        actions: [
+          Consumer(
+            builder: (context, ref, _) {
+              final exchangeAsync = ref.watch(exchangeDetailProvider(widget.exchangeId));
+              return exchangeAsync.when(
+                data: (exchange) {
+                  final otherUserId = exchange.requester.id == myId
+                      ? exchange.receiver.id
+                      : exchange.requester.id;
+                  return IconButton(
+                    icon: const Icon(Icons.chat_bubble_outline),
+                    onPressed: () => context.push('/messages/$otherUserId'),
+                    tooltip: 'Message',
+                  );
+                },
+                loading: () => const SizedBox.shrink(),
+                error: (_, _) => const SizedBox.shrink(),
+              );
+            },
+          ),
+        ],
+      ),
       body: AsyncValueWidget<SkillExchange>(
         value: exchangeAsync,
         onRetry: () =>

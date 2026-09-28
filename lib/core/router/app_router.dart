@@ -13,7 +13,13 @@ import '../../screens/home/splash_screen.dart';
 import '../../screens/matches/match_detail_screen.dart';
 import '../../screens/matches/matches_screen.dart';
 import '../../screens/matches/send_request_screen.dart';
+import '../../screens/messages/chat_screen.dart';
+import '../../screens/messages/conversations_screen.dart';
 import '../../screens/profile/add_skill_screen.dart';
+import '../../screens/profile/availability_screen.dart';
+import '../../screens/profile/change_password_screen.dart';
+import '../../screens/search/search_screen.dart';
+import '../../screens/sessions/propose_reschedule_screen.dart';
 import '../../screens/profile/edit_profile_screen.dart';
 import '../../screens/profile/profile_screen.dart';
 import '../../screens/ratings/rate_session_screen.dart';
@@ -57,6 +63,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
       GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
       GoRoute(path: '/register', builder: (context, state) => const RegisterScreen()),
+      GoRoute(path: '/search', builder: (context, state) => const SearchScreen()),
       GoRoute(
         path: '/users/:userId/ratings',
         builder: (context, state) => UserRatingsScreen(
@@ -127,7 +134,27 @@ final routerProvider = Provider<GoRouter>((ref) {
                         sessionId: int.parse(state.pathParameters['id']!),
                       ),
                     ),
+                    GoRoute(
+                      path: 'reschedule',
+                      builder: (context, state) => ProposeRescheduleScreen(
+                        sessionId: int.parse(state.pathParameters['id']!),
+                      ),
+                    ),
                   ],
+                ),
+              ],
+            ),
+          ]),
+          StatefulShellBranch(routes: [
+            GoRoute(
+              path: '/messages',
+              builder: (context, state) => const ConversationsScreen(),
+              routes: [
+                GoRoute(
+                  path: ':userId',
+                  builder: (context, state) => ChatScreen(
+                    otherUserId: int.parse(state.pathParameters['userId']!),
+                  ),
                 ),
               ],
             ),
@@ -139,6 +166,8 @@ final routerProvider = Provider<GoRouter>((ref) {
               routes: [
                 GoRoute(path: 'edit', builder: (context, state) => const EditProfileScreen()),
                 GoRoute(path: 'skills/add', builder: (context, state) => const AddSkillScreen()),
+                GoRoute(path: 'availability', builder: (context, state) => const AvailabilityScreen()),
+                GoRoute(path: 'change-password', builder: (context, state) => const ChangePasswordScreen()),
               ],
             ),
           ]),

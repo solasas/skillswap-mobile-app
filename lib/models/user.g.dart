@@ -13,6 +13,8 @@ _$UserImpl _$$UserImplFromJson(Map<String, dynamic> json) => _$UserImpl(
   bio: json['bio'] as String?,
   city: json['city'] as String?,
   role: json['role'] as String?,
+  averageRating: (json['averageRating'] as num?)?.toDouble(),
+  totalRatings: (json['totalRatings'] as num?)?.toInt(),
   createdAt: json['createdAt'] == null
       ? null
       : DateTime.parse(json['createdAt'] as String),
@@ -29,6 +31,8 @@ Map<String, dynamic> _$$UserImplToJson(_$UserImpl instance) =>
       'bio': instance.bio,
       'city': instance.city,
       'role': instance.role,
+      'averageRating': instance.averageRating,
+      'totalRatings': instance.totalRatings,
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
     };

@@ -12,6 +12,8 @@ class User with _$User {
     String? bio,
     String? city,
     String? role,
+    double? averageRating,
+    int? totalRatings,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) = _User;

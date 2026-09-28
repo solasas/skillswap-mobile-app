@@ -10,9 +10,13 @@ enum SkillType { teach, learn }
 
 enum ExchangeStatus { pending, accepted, rejected, completed }
 
+enum RescheduleStatus { pending, accepted, rejected }
+
 enum SessionMode { online, offline }
 
 enum SessionStatus { scheduled, completed, cancelled }
+
+enum WeekDay { monday, tuesday, wednesday, thursday, friday, saturday, sunday }
 
 extension SkillCategoryX on SkillCategory {
   String get wire => name.toUpperCase();
@@ -103,6 +107,28 @@ extension ExchangeStatusX on ExchangeStatus {
   }
 }
 
+extension RescheduleStatusX on RescheduleStatus {
+  String get wire => name.toUpperCase();
+
+  String get label {
+    switch (this) {
+      case RescheduleStatus.pending:
+        return 'Pending';
+      case RescheduleStatus.accepted:
+        return 'Accepted';
+      case RescheduleStatus.rejected:
+        return 'Rejected';
+    }
+  }
+
+  static RescheduleStatus fromWire(String? value) {
+    return RescheduleStatus.values.firstWhere(
+      (e) => e.wire == value,
+      orElse: () => RescheduleStatus.pending,
+    );
+  }
+}
+
 extension SessionModeX on SessionMode {
   String get wire => name.toUpperCase();
 
@@ -131,11 +157,47 @@ String skillTypeToJson(SkillType value) => value.wire;
 ExchangeStatus exchangeStatusFromJson(String? json) => ExchangeStatusX.fromWire(json);
 String exchangeStatusToJson(ExchangeStatus value) => value.wire;
 
+RescheduleStatus rescheduleStatusFromJson(String? json) => RescheduleStatusX.fromWire(json);
+String rescheduleStatusToJson(RescheduleStatus value) => value.wire;
+
 SessionMode sessionModeFromJson(String? json) => SessionModeX.fromWire(json);
 String sessionModeToJson(SessionMode value) => value.wire;
 
 SessionStatus sessionStatusFromJson(String? json) => SessionStatusX.fromWire(json);
 String sessionStatusToJson(SessionStatus value) => value.wire;
+
+extension WeekDayX on WeekDay {
+  String get wire => name.toUpperCase();
+
+  String get label {
+    switch (this) {
+      case WeekDay.monday:
+        return 'Monday';
+      case WeekDay.tuesday:
+        return 'Tuesday';
+      case WeekDay.wednesday:
+        return 'Wednesday';
+      case WeekDay.thursday:
+        return 'Thursday';
+      case WeekDay.friday:
+        return 'Friday';
+      case WeekDay.saturday:
+        return 'Saturday';
+      case WeekDay.sunday:
+        return 'Sunday';
+    }
+  }
+
+  static WeekDay fromWire(String? value) {
+    return WeekDay.values.firstWhere(
+      (e) => e.wire == value,
+      orElse: () => WeekDay.monday,
+    );
+  }
+}
+
+WeekDay weekDayFromJson(String? json) => WeekDayX.fromWire(json);
+String weekDayToJson(WeekDay value) => value.wire;
 
 extension SessionStatusX on SessionStatus {
   String get wire => name.toUpperCase();

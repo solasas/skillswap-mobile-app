@@ -34,7 +34,8 @@ class _MatchesScreenState extends ConsumerState<MatchesScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Matches'),
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
         bottom: TabBar(
           controller: _tabController,
           tabs: const [
@@ -81,9 +82,9 @@ class _MatchList extends ConsumerWidget {
             );
           }
           return ListView.separated(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             itemCount: list.length,
-            separatorBuilder: (_, _) => const SizedBox(height: 12),
+            separatorBuilder: (_, _) => const SizedBox(height: 8),
             itemBuilder: (context, index) {
               final match = list[index];
               return _MatchCard(match: match);
